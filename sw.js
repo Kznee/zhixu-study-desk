@@ -1,4 +1,4 @@
-const CACHE_VERSION='7e55dfa82c9cd604';
+const CACHE_VERSION='79274b7f1ca32630';
 const APP_BASE=new URL(self.registration.scope);
 const CACHE_PREFIX='zhixu-private-'+encodeURIComponent(APP_BASE.href)+'-';
 const OLD_PREFIX='zhixu-offline-'+encodeURIComponent(APP_BASE.href)+'-';
@@ -9,7 +9,7 @@ const OLD_FILES=new Set(['app.js','style.css','daily-quotes.js','life-features.j
 async function prepareCache(){const cache=await caches.open(CACHE_NAME);await cache.addAll(ASSETS.map(path=>new Request(path,{cache:'reload'})));}
 self.addEventListener('install',event=>event.waitUntil(prepareCache().then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil((async()=>{
- const names=await caches.keys(),migrating=names.some(name=>name.startsWith(OLD_PREFIX));
+ const names=await caches.keys(),migrating=names.some(name=>name.startsWith(OLD_PREFIX)||name.startsWith(CACHE_PREFIX)&&name!==CACHE_NAME);
  await Promise.all(names.filter(name=>name.startsWith(OLD_PREFIX)||name.startsWith(CACHE_PREFIX)&&name!==CACHE_NAME).map(name=>caches.delete(name)));
  await self.clients.claim();
  if(migrating){const windows=await self.clients.matchAll({type:'window'});for(const client of windows)if(client.url.startsWith(APP_BASE.href))client.navigate(client.url).catch(()=>{});}
